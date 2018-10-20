@@ -1,0 +1,10 @@
+C:\Users\Chardon\Documents\AADoc\ITMO\MultyThreading\TP1\SleepingBarber\SleepingBarber\bin\Debug\SleepingBarber.exe.config
+C:\Users\Chardon\Documents\AADoc\ITMO\MultyThreading\TP1\SleepingBarber\SleepingBarber\bin\Debug\SleepingBarber.exe
+C:\Users\Chardon\Documents\AADoc\ITMO\MultyThreading\TP1\SleepingBarber\SleepingBarber\bin\Debug\SleepingBarber.pdb
+C:\Users\Chardon\Documents\AADoc\ITMO\MultyThreading\TP1\SleepingBarber\SleepingBarber\obj\Debug\SleepingBarber.csprojAssemblyReference.cache
+C:\Users\Chardon\Documents\AADoc\ITMO\MultyThreading\TP1\SleepingBarber\SleepingBarber\obj\Debug\SleepingBarber.formBarberShop.resources
+C:\Users\Chardon\Documents\AADoc\ITMO\MultyThreading\TP1\SleepingBarber\SleepingBarber\obj\Debug\SleepingBarber.Properties.Resources.resources
+C:\Users\Chardon\Documents\AADoc\ITMO\MultyThreading\TP1\SleepingBarber\SleepingBarber\obj\Debug\SleepingBarber.csproj.GenerateResource.cache
+C:\Users\Chardon\Documents\AADoc\ITMO\MultyThreading\TP1\SleepingBarber\SleepingBarber\obj\Debug\SleepingBarber.csproj.CoreCompileInputs.cache
+C:\Users\Chardon\Documents\AADoc\ITMO\MultyThreading\TP1\SleepingBarber\SleepingBarber\obj\Debug\SleepingBarber.exe
+C:\Users\Chardon\Documents\AADoc\ITMO\MultyThreading\TP1\SleepingBarber\SleepingBarber\obj\Debug\SleepingBarber.pdb
