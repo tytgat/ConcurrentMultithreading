@@ -259,3 +259,18 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+*.sln
+*.zip
+*.csproj
+*.vcxproj
+*.filters
+*.cs
+TP3/IntegralOpenMP/IntegralOpenMP/pch.cpp
+TP3/IntegralOpenMP/IntegralOpenMP/pch.h
+TP3/LUDecomposition/LUDecomposition/pch.h
+TP3/LUDecomposition/LUDecomposition/pch.cpp
+TP3/LUMatrixDecomposition/LUMatrixDecomposition/pch.cpp
+TP3/LUMatrixDecomposition/LUMatrixDecomposition/pch.h
+TP3/LUMatrix/LUMatrix/pch.cpp
+TP3/LUMatrix/LUMatrix/pch.h
+*.prefs
