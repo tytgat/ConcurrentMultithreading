@@ -50,12 +50,7 @@ namespace SleepingBarber
                     return true;
                 }
             }
-            
             return false;
         }
-
-
-
-
     }
 }

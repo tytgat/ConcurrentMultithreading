@@ -29,7 +29,6 @@ namespace SleepingBarber
         {
             InitializeComponent();
 
-
             /*Waiting Room*/
             int nbOfSeat = 0;
             List<Chair> chairs = new List<Chair>();
@@ -41,7 +40,6 @@ namespace SleepingBarber
                     nbOfSeat++;
                     chairs.Add(new Chair((PictureBox)control));
                 }
-
             }
             room = new WaitingRoom(chairs, nbOfSeat);
 
@@ -131,14 +129,12 @@ namespace SleepingBarber
             SetLabelClient("New Client entered");
             semWaitingRoom.WaitOne();
             
-
             if(room.hasFreeSeat())
             {
                 room.takeSeat();
                 semClient.Release();
                 semWaitingRoom.Release();
                 semBarber.WaitOne();
-                
             }
             else
             {
