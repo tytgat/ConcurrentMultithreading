@@ -274,3 +274,4 @@ TP3/LUMatrixDecomposition/LUMatrixDecomposition/pch.h
 TP3/LUMatrix/LUMatrix/pch.cpp
 TP3/LUMatrix/LUMatrix/pch.h
 *.prefs
+*.config

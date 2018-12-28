@@ -36,8 +36,8 @@ int main()
 	/*Fill Mat*/
 	for (int i = 0; i < SIZE; i++) {
 		for (int j = 0; j < SIZE; j++) {
-			A[i][j] = i + j;// rand() % 100;
-			B[i][j] = i + j;// rand() % 100;
+			A[i][j] = rand() % 100;
+			B[i][j] = rand() % 100;
 		}
 	}
 	clock_t begin = clock();
@@ -58,11 +58,11 @@ int main()
 	float elapsed_secs = float(end - begin) / CLOCKS_PER_SEC;
 	cout << elapsed_secs << "s" << endl;
 	cout << endl;
-
+	/*
 	printMat(A);
 	printMat(B);
 	printMat(C);
-
+	*/
 	/*Free Mat*/
 	for (int i = 0; i < SIZE; i++) {
 		free(A[i]);

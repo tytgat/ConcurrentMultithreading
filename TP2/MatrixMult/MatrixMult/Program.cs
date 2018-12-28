@@ -15,7 +15,7 @@ namespace MatrixMult
         public static int MATHEIGHT = 100;
 
         
-        public static int nbOfExec = 30;
+        public static int nbOfExec = 200;
 
         static void Main(string[] args) {
             /** With Thread **/
@@ -34,8 +34,16 @@ namespace MatrixMult
         public static double launchTry(bool useThread)
         {
             double avgExecTime = 0;
-            for (int i = 0; i < nbOfExec; i++)
+            for (int i = 0; i <= nbOfExec; i = i+5)
             {
+                Console.Write(i*10 + ";");
+            }
+            Console.WriteLine("");
+            for (int i = 0; i <= nbOfExec; i= i+5)
+            {
+                MATWIDTH = i * 10;
+                MATHEIGHT = i * 10;
+                
                 avgExecTime += multiplyMatrix(useThread);
             }
             avgExecTime /= nbOfExec;
@@ -90,15 +98,9 @@ namespace MatrixMult
                 }
             }
 
-            /*Console.WriteLine("m1");
-            printMat(m1);
-            Console.WriteLine("m2");
-            printMat(m2);
-            Console.WriteLine("matFinal");
-            printMat(matFinal);*/
             watch.Stop();
             execTime = watch.ElapsedMilliseconds;
-
+            Console.Write(execTime + ";");
             return execTime;
         }
 
