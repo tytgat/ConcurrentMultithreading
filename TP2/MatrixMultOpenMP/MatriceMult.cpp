@@ -40,20 +40,21 @@ int main()
 			B[i][j] = rand() % 100;
 		}
 	}
+	
 	clock_t begin = clock();
 #pragma omp parallel for shared(C)
-	{
-		for (int i = 0; i < SIZE; i++) {
-#pragma omp parallel for shared(C,i)
-			for (int j = 0; j < SIZE; j++) {
-				int sum = 0;
-				for (int k = 0; k < SIZE; k++) {
-					sum += A[i][k] * B[k][j];
-				}
-				C[i][j] = sum;
+	for (int i = 0; i < size; i++) {
+#pragma omp parallel for shared(C)
+		for (int j = 0; j < size; j++) {
+			int sum = 0;
+#pragma omp parallel for shared(C,sum)
+			for (int k = 0; k < size; k++) {
+				sum += A[i][k] * B[k][j];
 			}
+			C[i][j] = sum;
 		}
 	}
+	
 	clock_t end = clock();
 	float elapsed_secs = float(end - begin) / CLOCKS_PER_SEC;
 	cout << elapsed_secs << "s" << endl;

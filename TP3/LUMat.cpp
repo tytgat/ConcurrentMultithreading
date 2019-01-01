@@ -1,6 +1,3 @@
-// LUMat.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include "pch.h"
 #include <iostream>
 #include <ctime>
@@ -9,11 +6,15 @@
 
 using namespace std;
 
+int roundFloat(float val) {
+	return (int)(val + 0.5);
+
+}
 
 void printMat(float ** M) {
 	for (int i = 0; i < SIZE; i++) {
 		for (int j = 0; j < SIZE; j++) {
-			cout << float(int(M[i][j]*100))/100 << ", ";
+			cout << float(int(M[i][j] * 100)) / 100 << ", ";
 		}
 		cout << endl;
 	}
@@ -26,23 +27,19 @@ int checkResult(float** L, float ** U, float ** M) {
 		C[i] = new float[SIZE];
 	}
 #pragma omp parallel for shared(C)
-	{
-		for (int i = 0; i < SIZE; i++) {
+	for (int i = 0; i < SIZE; i++) {
 #pragma omp parallel for shared(C,i)
-			for (int j = 0; j < SIZE; j++) {
-				float sum = 0;
-				for (int k = 0; k < SIZE; k++) {
-					sum += L[i][k] * U[k][j];
-				}
-				C[i][j] = sum;
+		for (int j = 0; j < SIZE; j++) {
+			float sum = 0;
+			for (int k = 0; k < SIZE; k++) {
+				sum += L[i][k] * U[k][j];
 			}
+			C[i][j] = sum;
 		}
 	}
-#pragma omp parallel for
 	for (int i = 0; i < SIZE; i++) {
-#pragma omp parallel for
 		for (int j = 0; j < SIZE; j++) {
-			if (C[i][j] != M[i][j]) {
+			if (roundFloat(C[i][j]) != roundFloat(M[i][j])) {
 				for (int i = 0; i < SIZE; i++) {
 					free(C[i]);
 				}
@@ -83,40 +80,33 @@ int main()
 	clock_t begin = clock();
 	for (int i = 0; i < SIZE; i++) {
 		{
-//Para U computing --> U[i][k] is modified but never used (i <> j)
+			//Para U computing --> U[i][k] is modified but never used (i <> j)
 #pragma omp parallel for shared(U)
-			{
-				/* U */
-				for (int k = i; k < SIZE; k++) {
-					float sum = 0;
-//Para sum of values
-#pragma omp parallel for  shared(U, sum)
-					{
-						for (int j = 0; j < i; j++) {
-							sum += (L[i][j] * U[j][k]);
-						}
-					}
-					U[i][k] = M[i][k] - sum;
+			/* U */
+			for (int k = i; k < SIZE; k++) {
+				float sum = 0;
+				//Para sum of values
+#pragma omp parallel for  reduction(+:sum)
+				for (int j = 0; j < i; j++) {
+					sum += (L[i][j] * U[j][k]);
 				}
+				U[i][k] = M[i][k] - sum;
 			}
-//Para L computing --> L[i][k] is modified but never used (i <> j)
+			
+			//Para L computing --> L[i][k] is modified but never used (i <> j)
 #pragma omp parallel for shared(L)
-			{
-				/* L */
-				for (int k = i; k < SIZE; k++) {
-					if (i == k)
-						L[i][i] = 1; // Diag
-					else {
-						float sum = 0;
-						//Para sum of values
-#pragma omp parallel for shared(L, sum)
-						{
-							for (int j = 0; j < i; j++) {
-								sum += (L[k][j] * U[j][i]);
-							}
-						}
-						L[k][i] = (M[k][i] - sum) / U[i][i];
+			/* L */
+			for (int k = i; k < SIZE; k++) {
+				if (i == k)
+					L[i][i] = 1; // Diag
+				else {
+					float sum = 0;
+					//Para sum of values
+#pragma omp parallel for reduction(+:sum)
+					for (int j = 0; j < i; j++) {
+						sum += (L[k][j] * U[j][i]);
 					}
+					L[k][i] = (M[k][i] - sum) / U[i][i];
 				}
 			}
 		}
@@ -127,7 +117,7 @@ int main()
 	cout << endl;
 
 
-	if (checkResult) {
+	if (checkResult(L,U,M)) {
 		cout << "result OK" << endl;
 	}
 	else {
@@ -144,14 +134,3 @@ int main()
 	free(U);
 	free(M);
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
