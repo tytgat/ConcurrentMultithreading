@@ -4,77 +4,96 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-#define N 5
-#define M 3
+//#define BLOCK_SIZE 4
 
-//cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
-__global__ void MatAdd(int A[][M], int C[][N]) {
-	int i = threadIdx.x;
-	int j = threadIdx.y;
-	int k = blockIdx.x; 
-	int val = (A[k][i] - A[k][j]) * (A[k][i] - A[k][j]);
-	extern __shared__ int sharedC[N][N];
-	sharedC[i][j] = C[i][j];
+#define N 256
+#define BLOCK_SIZE 3
 
-	if (i == 0 && j == 1)
-		printf("[%d - %d] - %d => %d + %d -- (%d-%d)^2\n", i, j, k, val, sharedC[i][j], A[k][i], A[k][j]);
+__global__ void matMult(float * a, float * d, int n){
+	int bx = blockIdx.x;
+	int by = blockIdx.y;
+	int tx = threadIdx.x; // y index
+	int ty = threadIdx.y;
 
+	int ia = n * BLOCK_SIZE * by + n * ty; // index A 
+	int ib = BLOCK_SIZE * bx + tx; //index B
+	int ic = ia + ib;
+
+	int indexLst = ic;
+	int i = indexLst / n;
+	int j = indexLst % n;
+
+	float sum = 0.0f;
+	__shared__ float ai[BLOCK_SIZE][BLOCK_SIZE+1];
+	__shared__ float aj[BLOCK_SIZE][BLOCK_SIZE+1];
+
+	for (int k = 0; k < BLOCK_SIZE; k++) {
+		ai[i][k] = a[k + i * BLOCK_SIZE];
+		aj[j][k] = a[k + j * BLOCK_SIZE];
+	}
 	__syncthreads();
-	sharedC[i][j] += val;
+	for (int l = 0; l < BLOCK_SIZE; l++) {
+		sum += (ai[i][l] - aj[j][l]) * (ai[i][l] - aj[j][l]);
+	}
 	__syncthreads();
-	
-	C[i][j] = sharedC[i][j];
+	d[indexLst] = sum;
 }
 
 int main() {
+	//define memory size
+	int numBytes = N * N * sizeof(float); 
 
-	int A[N][M] = { {0,1,1},{4,0,2},{3,1,1},{0,0,0},{2,1,2} };
-	int C[N][N];
-	int i, j;
-	/*for (i = 0; i < N; i++) {
-		for (j = 0; j < M; j++) {
-			A[i][j] = i + j;
-			printf("%d ", A[i][j]);
+	float h_A[N*BLOCK_SIZE];
+	float h_D[N*N];
+
+	/*init matrix*/ 
+	int i = 0;
+	for (i = 0; i < N*BLOCK_SIZE; i++) {
+		h_A[i] = (float)i+1;
+	}
+	for (i = 0; i < N*N; i++) {
+		h_D[i] = 0.0;
+	}
+	
+
+	//assign variable for device
+	float * d_A;
+	float * d_D;
+
+	// allocate device memory
+	cudaMalloc((void**)&d_A, numBytes);
+	cudaMalloc((void**)&d_D, numBytes);
+
+	// set kernel launch configuration
+	dim3 threads(BLOCK_SIZE, BLOCK_SIZE);
+	dim3 blocks(N/ BLOCK_SIZE,N/ BLOCK_SIZE);
+	
+	//copy data from host to device
+	cudaMemcpy(d_A, h_A, numBytes, cudaMemcpyHostToDevice);
+	
+	clock_t begin = clock();
+	//kernel launch
+	matMult <<<blocks, threads >> > (d_A, d_D, N);
+	clock_t end = clock();
+	double time_spent = (double)(end - begin);
+	printf("%d", time_spent);
+	//copy data from device to host
+	cudaMemcpy(h_D, d_D, numBytes, cudaMemcpyDeviceToHost);
+
+	/*for (i = 0; i < N*N; i++) {
+		if (i%N == 0) {
+			printf("\n");
 		}
-		printf("\n");
+		printf("%.1f,\t", h_D[i]);
 	}*/
 
-	for (i = 0; i < N; i++) {
-		for (j = 0; j < N; j++) {
-			C[i][j] = 0;
-		}
-	}
+	//memory free
+	cudaFree(d_A);
+	cudaFree(d_D);
 
-	int(*pA)[M], (*pC)[N];
-
-	cudaMalloc((void**)&pA, (N*M) * sizeof(int));
-	cudaMalloc((void**)&pC, (N*N) * sizeof(int));
-
-	cudaMemcpy(pA, A, (N*M) * sizeof(int), cudaMemcpyHostToDevice);
-	cudaMemcpy(pC, C, (N*N) * sizeof(int), cudaMemcpyHostToDevice);
-
-	int numBlocks = N;
-	dim3 threadsPerBlock(N,N);
-	int k;
-	//for (k = 0; k < N; k++) {
-		MatAdd <<<numBlocks, threadsPerBlock >> > (pA, pC);
-	//}
-
-	cudaMemcpy(C, pC, (N*N) * sizeof(int), cudaMemcpyDeviceToHost);
-
-	printf("C = \n");
-	for (i = 0; i < N; i++) {
-		for (j = 0; j < N; j++) {
-			printf("%d ", C[i][j]);
-		}
-		printf("\n");
-	}
-
-	cudaFree(pA);
-	cudaFree(pC);
-
-	printf("\n");
 
 	return 0;
+
 }
