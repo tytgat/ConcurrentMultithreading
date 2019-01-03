@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-//#define BLOCK_SIZE 4
-
 #define N 256
 #define BLOCK_SIZE 3
 
